@@ -1,23 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import { AssetInfo } from './components/AssetInfo/AssetInfo';
+import { Header } from './components/Header/Header';
+import { useState, useEffect } from 'react';
+import { vestService } from './services/api';
 
 function App() {
+  const [ticker, setTicker] = useState('BTC-PERP');
+  const [tickerDetails, setTickerDetails] = useState({});
+
+  useEffect(() => {
+    const getTickerDetail = async () => {
+      try {
+        const response = await vestService.get24HourTicker(ticker);
+        setTickerDetails(response.data);
+      } catch (error) {
+        console.error('Failed to get ticker', error);
+      }
+    };
+    getTickerDetail();
+  }, [ticker]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <Header />
+      <AssetInfo />
     </div>
   );
 }

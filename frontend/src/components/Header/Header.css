@@ -1,0 +1,11 @@
+.app-header {
+  display: flex;
+  position: relative;
+  top: 16px;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 90%;
+  flex-direction: row;
+  column-gap: 10px;
+}
