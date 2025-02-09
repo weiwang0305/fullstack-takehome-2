@@ -4,6 +4,8 @@ import { Header } from './components/Header/Header';
 import { useState } from 'react';
 import { useTickerData } from './hooks/useTickerData';
 import { TradingChart } from './components/TradingChart/TradingChart';
+import { ChartSelector } from './components/TradingChart/ChartSelector/ChartSelector';
+import { TradingPanel } from './components/TradingPanel/TradingPanel';
 
 function App() {
   const [ticker, setTicker] = useState('ETH-PERP');
@@ -18,13 +20,17 @@ function App() {
     <div className='App'>
       <Header />
       <AssetInfo tickerData={tickerData} />
-      <TradingChart
-        ticker={ticker}
-        startTime={startTime}
-        endTime={endTime}
-        limit={limit}
-        interval={interval}
-      />
+      <ChartSelector />
+      <div className='trading-container'>
+        <TradingChart
+          ticker={ticker}
+          startTime={startTime}
+          endTime={endTime}
+          limit={limit}
+          interval={interval}
+        />
+        <TradingPanel />
+      </div>
     </div>
   );
 }

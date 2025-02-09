@@ -3,6 +3,8 @@ import { createChart } from 'lightweight-charts';
 import { useRef, useEffect, useCallback } from 'react';
 import { useTickerKLine } from '../../hooks/useTickerKLine';
 import { ChartControls } from './ChartControls/ChartControls';
+import { ChartToolbar } from './ChartToolbar/ChartToolbar';
+import { ChartSelector } from './ChartSelector/ChartSelector';
 
 export const TradingChart = ({
   ticker,
@@ -114,26 +116,29 @@ export const TradingChart = ({
   }, [tickerKLineData, transformKLineData]);
 
   return (
-    <div className='trading-chart'>
+    <div className='chart-container'>
       <ChartControls />
-      <div ref={chartContainerRef} className='chart-container' />
-      {tickerKLineData && tickerKLineData.length > 0 && (
-        <div className='chart-latest-details'>
-          <div className='chart-ticker-details'>
-            <span>{ticker}</span>
-            <span>·</span>
-            <span>1H</span>
-            <span>·</span>
-            <span>Vest</span>
+      <div className='chart-overview'>
+        <ChartToolbar />
+        <div ref={chartContainerRef} className='chart' />
+        {tickerKLineData && tickerKLineData.length > 0 && (
+          <div className='chart-latest-details'>
+            <div className='chart-ticker-details'>
+              <span>{ticker}</span>
+              <span>·</span>
+              <span>1H</span>
+              <span>·</span>
+              <span>Vest</span>
+            </div>
+            <div className='chart-price-details'>
+              <span>O: {tickerKLineData[tickerKLineData.length - 1][1]}</span>
+              <span>H: {tickerKLineData[tickerKLineData.length - 1][2]}</span>
+              <span>L: {tickerKLineData[tickerKLineData.length - 1][3]}</span>
+              <span>C: {tickerKLineData[tickerKLineData.length - 1][4]}</span>
+            </div>
           </div>
-          <div className='chart-price-details'>
-            <span>O: {tickerKLineData[tickerKLineData.length - 1][1]}</span>
-            <span>H: {tickerKLineData[tickerKLineData.length - 1][2]}</span>
-            <span>L: {tickerKLineData[tickerKLineData.length - 1][3]}</span>
-            <span>C: {tickerKLineData[tickerKLineData.length - 1][4]}</span>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

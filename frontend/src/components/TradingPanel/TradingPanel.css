@@ -1,0 +1,25 @@
+.trading-panel {
+  display: flex;
+  width: 25%;
+  height: 100%;
+  justify-content: center;
+  align-items: start;
+}
+
+.position-selector {
+  display: flex;
+  width: 80%;
+  height: fit-content;
+}
+.position-button {
+  display: flex;
+  width: 50%;
+  height: 30px;
+  justify-content: center;
+  padding: 2px;
+  transition: border-bottom 0.2s ease-in-out;
+}
+
+.position-button--active {
+  border-bottom: 1px solid #ff5a44;
+}

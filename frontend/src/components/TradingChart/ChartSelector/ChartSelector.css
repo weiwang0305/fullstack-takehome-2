@@ -1,0 +1,14 @@
+.chart-selector {
+  display: flex;
+  width: 100%;
+  color: #aeadad;
+  gap: 8px;
+}
+.chart-selector span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 12px;
+  width: 40px;
+  padding: 16px;
+}

@@ -1,0 +1,33 @@
+.chart-controls {
+  width: 100%;
+  display: flex;
+  height: fit-content;
+  color: white;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px;
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.left-controls span {
+  display: flex;
+  border-right: 1px solid #aeadad;
+  padding-right: 10px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.right-controls {
+  border-left: 1px solid #aeadad;
+  padding-left: 10px;
+}
