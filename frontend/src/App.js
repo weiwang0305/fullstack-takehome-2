@@ -3,27 +3,19 @@ import { AssetInfo } from './components/AssetInfo/AssetInfo';
 import { Header } from './components/Header/Header';
 import { useState, useEffect } from 'react';
 import { vestService } from './services/api';
+import { useTickerData } from './hooks/useTickerData';
 
 function App() {
-  const [ticker, setTicker] = useState('BTC-PERP');
-  const [tickerDetails, setTickerDetails] = useState({});
+  const [ticker, setTicker] = useState('ETH-PERP');
 
-  useEffect(() => {
-    const getTickerDetail = async () => {
-      try {
-        const response = await vestService.get24HourTicker(ticker);
-        setTickerDetails(response.data);
-      } catch (error) {
-        console.error('Failed to get ticker', error);
-      }
-    };
-    getTickerDetail();
-  }, [ticker]);
+  const { tickerData, isLoading, error } = useTickerData(ticker);
 
+  console.log('tickerdata', tickerData);
   return (
     <div className='App'>
       <Header />
-      <AssetInfo />
+      <AssetInfo tickerData={tickerData} />
+      <TradingChart />
     </div>
   );
 }

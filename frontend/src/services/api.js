@@ -1,5 +1,5 @@
 const API_URL = 'http://localhost:3001';
-const VEST_BASE_URL = 'https://server-mmdev.vest.exchange/v2/';
+const VEST_BASE_URL = 'https://serverprod.vest.exchange/v2';
 
 const DEFAULT_HEADER = {
   'Content-Type': 'application/json',
@@ -16,7 +16,13 @@ const handleResponse = async (response) => {
 
 export const vestService = {
   get24HourTicker: async (ticker) => {
-    return fetch(`${API_URL}/${ticker}/24hr`, {
+    return fetch(`${VEST_BASE_URL}/ticker/24hr?symbols=${ticker}`, {
+      method: 'GET',
+      headers: DEFAULT_HEADER,
+    }).then(handleResponse);
+  },
+  getLatestTicker: async (ticker) => {
+    return fetch(`${VEST_BASE_URL}/ticker/latest?symbols=${ticker}`, {
       method: 'GET',
       headers: DEFAULT_HEADER,
     }).then(handleResponse);
