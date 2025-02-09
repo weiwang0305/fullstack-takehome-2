@@ -27,4 +27,13 @@ export const vestService = {
       headers: DEFAULT_HEADER,
     }).then(handleResponse);
   },
+  getKLines: async (ticker, startTime, endTime, limit, interval) => {
+    return fetch(
+      `${VEST_BASE_URL}/klines?symbol=${ticker}&startTime=${startTime}&endTime=${endTime}&limit=${limit}&interval=${interval}`,
+      {
+        method: 'GET',
+        headers: DEFAULT_HEADER,
+      }
+    ).then(handleResponse);
+  },
 };
