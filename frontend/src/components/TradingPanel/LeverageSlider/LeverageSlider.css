@@ -1,0 +1,77 @@
+.leverage-slider {
+  width: 100%;
+}
+
+.leverage-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.leverage-slider-container {
+  padding-top: 10px;
+}
+
+.leverage-slider-track {
+  position: relative;
+}
+
+.leverage-slider-trackline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #333;
+}
+
+.leverage-slider-input {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+}
+
+.leverage-slider-input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+}
+
+.leverage-slider-marker-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.leverage-slider-marker {
+  width: 2px;
+  height: 8px;
+  background-color: #333;
+}
+
+.leverage-slider-marker--active {
+  background-color: white;
+}
+
+.leverage-slider-tick-label {
+  color: #aeadad;
+  font-size: 12px;
+  margin-top: 8px;
+}

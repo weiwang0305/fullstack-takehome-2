@@ -33,4 +33,10 @@
   line-height: 18.2px;
   height: fit-content;
   margin: 0;
+  font-weight: 700;
+  color: #4bc2a3;
+}
+.asset-ticker {
+  font-weight: bolder;
+  font-size: 16px;
 }

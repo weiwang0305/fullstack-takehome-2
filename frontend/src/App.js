@@ -13,6 +13,7 @@ function App() {
   const [endTime, setEndTime] = useState(Date.now());
   const [limit, setLimit] = useState(50);
   const [interval, setInterval] = useState('1h');
+  const [chartType, setChartType] = useState('PRICE');
 
   const { tickerData, isLoading, error } = useTickerData(ticker);
 
@@ -20,7 +21,7 @@ function App() {
     <div className='App'>
       <Header />
       <AssetInfo tickerData={tickerData} />
-      <ChartSelector />
+      <ChartSelector chartType={chartType} />
       <div className='trading-container'>
         <TradingChart
           ticker={ticker}

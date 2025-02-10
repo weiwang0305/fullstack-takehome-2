@@ -1,4 +1,3 @@
-// services/websocket.js
 const WS_BASE_URL =
   'wss://devws.vest.exchange/ws-api?version=1.0&xwebsocketserver=restserver0';
 
@@ -133,13 +132,9 @@ const setupWebSocket = (url, symbol, onMessage) => {
 export const wsService = {
   connect: async (symbol, onMessage) => {
     if (!symbol) return;
-
-    // Prevent multiple simultaneous connection attempts
     if (isConnecting) {
       return connectionPromise;
     }
-
-    // If already connected, just subscribe
     if (ws?.readyState === WebSocket.OPEN) {
       return subscribe(symbol);
     }

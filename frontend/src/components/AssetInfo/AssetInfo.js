@@ -4,7 +4,7 @@ export const AssetInfo = ({ tickerData }) => {
   return (
     <div className='asset-info'>
       <div className='asset-info-block'>
-        <p>{tickerData?.symbol}</p>
+        <p className='asset-ticker'>{tickerData?.symbol}</p>
       </div>
       <div className='asset-info-block'>
         <p className='asset-description'>PRICE</p>

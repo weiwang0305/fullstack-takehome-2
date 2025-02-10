@@ -1,0 +1,17 @@
+.risk-parameters {
+  color: #aeadad;
+  margin-top: 50px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.risk-parameter-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.risk-parameter__percent {
+  color: #666;
+}

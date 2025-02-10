@@ -2,9 +2,9 @@ import './TradingChart.css';
 import { createChart } from 'lightweight-charts';
 import { useRef, useEffect, useCallback } from 'react';
 import { useTickerKLine } from '../../hooks/useTickerKLine';
+import { useWebSocketData } from '../../hooks/useWebSocketData';
 import { ChartControls } from './ChartControls/ChartControls';
 import { ChartToolbar } from './ChartToolbar/ChartToolbar';
-import { ChartSelector } from './ChartSelector/ChartSelector';
 
 export const TradingChart = ({
   ticker,
@@ -23,6 +23,9 @@ export const TradingChart = ({
     limit,
     interval
   );
+  const { data, error } = useWebSocketData(ticker);
+
+  console.log('data', data);
 
   const transformKLineData = useCallback((klineData) => {
     if (!klineData || !Array.isArray(klineData)) {
@@ -30,9 +33,7 @@ export const TradingChart = ({
     }
 
     try {
-      const timeMap = new Map();
-
-      klineData.forEach((candle) => {
+      return klineData.map((candle) => {
         const utcDate = new Date(Number(candle[0]));
         const utcTimestamp =
           Date.UTC(
@@ -43,30 +44,14 @@ export const TradingChart = ({
             utcDate.getUTCMinutes()
           ) / 1000;
 
-        if (
-          !timeMap.has(utcTimestamp) ||
-          Number(candle[0]) > timeMap.get(utcTimestamp).originalTime
-        ) {
-          timeMap.set(utcTimestamp, {
-            time: utcTimestamp,
-            originalTime: Number(candle[0]),
-            open: Number(candle[1]),
-            high: Number(candle[2]),
-            low: Number(candle[3]),
-            close: Number(candle[4]),
-          });
-        }
+        return {
+          time: utcTimestamp,
+          open: Number(candle[1]),
+          high: Number(candle[2]),
+          low: Number(candle[3]),
+          close: Number(candle[4]),
+        };
       });
-
-      return Array.from(timeMap.values())
-        .sort((a, b) => a.time - b.time)
-        .map((candle) => ({
-          time: candle.time,
-          open: candle.open,
-          high: candle.high,
-          low: candle.low,
-          close: candle.close,
-        }));
     } catch (error) {
       console.error('Error transforming data:', error);
       return [];
@@ -103,6 +88,25 @@ export const TradingChart = ({
       wickUpColor: '#26a69a',
       wickDownColor: '#ef5350',
     });
+
+    const handleResize = () => {
+      if (chartRef.current && chartContainerRef.current) {
+        chartRef.current.applyOptions({
+          width: chartContainerRef.current.clientWidth - 30,
+        });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (chartRef.current) {
+        chartRef.current.remove();
+        chartRef.current = null;
+        candlestickSeriesRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
