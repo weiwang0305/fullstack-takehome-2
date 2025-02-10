@@ -6,6 +6,8 @@ let pingInterval = null;
 let connectionPromise = null;
 let isConnecting = false;
 let reconnectAttempts = 0;
+let reconnectTimeout = null;
+let currentSymbol = null;
 
 const CONFIG = {
   maxReconnectAttempts: 5,
@@ -14,16 +16,35 @@ const CONFIG = {
 };
 
 const cleanup = () => {
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+  }
+
   if (pingInterval) {
     clearInterval(pingInterval);
     pingInterval = null;
   }
+
   if (ws) {
-    ws.close();
+    ws.onclose = null;
+    ws.onerror = null;
+    ws.onmessage = null;
+    ws.onopen = null;
+
+    if (
+      ws.readyState === WebSocket.OPEN ||
+      ws.readyState === WebSocket.CONNECTING
+    ) {
+      ws.close();
+    }
     ws = null;
   }
+
   connectionPromise = null;
   isConnecting = false;
+  reconnectAttempts = 0;
+  currentSymbol = null;
 };
 
 const startPingInterval = () => {
@@ -61,14 +82,14 @@ const handleWebSocketMessage = async (event, onMessage) => {
   }
 };
 
-const subscribe = async (symbol) => {
+const subscribe = async (symbol, interval) => {
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     throw new Error('WebSocket is not connected');
   }
 
   const subscribeMessage = {
     method: 'SUBSCRIBE',
-    params: [`${symbol}@kline_1m`],
+    params: [`${symbol}@kline_${interval}`],
     id: 1,
   };
 
@@ -76,20 +97,24 @@ const subscribe = async (symbol) => {
   ws.send(JSON.stringify(subscribeMessage));
 };
 
-const attemptReconnect = (symbol, onMessage) => {
+const attemptReconnect = (symbol, interval, onMessage) => {
+  if (symbol !== currentSymbol) return;
+
   if (reconnectAttempts < CONFIG.maxReconnectAttempts) {
     reconnectAttempts++;
     const delay =
       CONFIG.baseReconnectDelay * Math.pow(2, reconnectAttempts - 1);
     console.log(`Attempting to reconnect in ${delay}ms...`);
 
-    setTimeout(() => {
-      wsService.connect(symbol, onMessage).catch(console.error);
+    reconnectTimeout = setTimeout(() => {
+      if (symbol === currentSymbol) {
+        wsService.connect(symbol, interval, onMessage).catch(console.error);
+      }
     }, delay);
   }
 };
 
-const setupWebSocket = (url, symbol, onMessage) => {
+const setupWebSocket = (url, symbol, interval, onMessage) => {
   return new Promise((resolve, reject) => {
     try {
       ws = new WebSocket(url);
@@ -98,10 +123,11 @@ const setupWebSocket = (url, symbol, onMessage) => {
         console.log('WebSocket Connected');
         isConnecting = false;
         reconnectAttempts = 0;
+        currentSymbol = symbol;
         startPingInterval();
 
         try {
-          await subscribe(symbol);
+          await subscribe(symbol, interval);
           resolve();
         } catch (error) {
           reject(error);
@@ -118,8 +144,10 @@ const setupWebSocket = (url, symbol, onMessage) => {
 
       ws.onclose = (event) => {
         console.log('WebSocket Disconnected:', event.code, event.reason);
-        cleanup();
-        attemptReconnect(symbol, onMessage);
+        if (symbol === currentSymbol) {
+          cleanup();
+          attemptReconnect(symbol, interval, onMessage);
+        }
       };
     } catch (error) {
       console.error('Connection error:', error);
@@ -130,23 +158,25 @@ const setupWebSocket = (url, symbol, onMessage) => {
 };
 
 export const wsService = {
-  connect: async (symbol, onMessage) => {
+  connect: async (symbol, interval, onMessage) => {
     if (!symbol) return;
+
+    if (currentSymbol !== symbol) {
+      cleanup();
+    }
+
     if (isConnecting) {
       return connectionPromise;
-    }
-    if (ws?.readyState === WebSocket.OPEN) {
-      return subscribe(symbol);
     }
 
     console.log('Connecting to WebSocket...');
     isConnecting = true;
+    currentSymbol = symbol;
 
     try {
       const url = WS_BASE_URL;
       console.log('Connecting to URL:', url);
-
-      connectionPromise = setupWebSocket(url, symbol, onMessage);
+      connectionPromise = setupWebSocket(url, symbol, interval, onMessage);
       return await connectionPromise;
     } catch (error) {
       cleanup();

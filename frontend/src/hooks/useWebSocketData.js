@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { wsService } from '../services/websocket';
 
-export const useWebSocketData = (symbol) => {
-  const [data, setData] = useState([]);
+export const useWebSocketData = (ticker, interval) => {
+  const [latestData, setLatestData] = useState();
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -10,16 +10,18 @@ export const useWebSocketData = (symbol) => {
 
     const connectWebSocket = async () => {
       try {
-        await wsService.connect(symbol, (message) => {
-          if (isSubscribed) {
-            const newData = {
-              time: new Date(message.data[0]).getTime(),
-              open: parseFloat(message.data[1]),
-              high: parseFloat(message.data[2]),
-              low: parseFloat(message.data[3]),
-              close: parseFloat(message.data[4]),
-            };
-            setData((prev) => [...prev, newData]);
+        await wsService.connect(ticker, interval, (message) => {
+          if (
+            isSubscribed &&
+            message.channel === `${ticker}@kline_${interval}`
+          ) {
+            setLatestData({
+              time: message.data[0] / 1000,
+              open: Number(message.data[1]),
+              high: Number(message.data[2]),
+              low: Number(message.data[3]),
+              close: Number(message.data[4]),
+            });
           }
         });
       } catch (err) {
@@ -28,12 +30,11 @@ export const useWebSocketData = (symbol) => {
         }
       }
     };
-    if (symbol) {
+
+    if (ticker && interval) {
       connectWebSocket();
     }
-  }, [symbol]);
+  }, [interval, ticker]);
 
-  console.log('data', data);
-
-  return { data, error };
+  return { latestData, error };
 };

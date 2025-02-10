@@ -1,31 +1,13 @@
 import './TradingChart.css';
 import { createChart } from 'lightweight-charts';
 import { useRef, useEffect, useCallback } from 'react';
-import { useTickerKLine } from '../../hooks/useTickerKLine';
-import { useWebSocketData } from '../../hooks/useWebSocketData';
 import { ChartControls } from './ChartControls/ChartControls';
 import { ChartToolbar } from './ChartToolbar/ChartToolbar';
 
-export const TradingChart = ({
-  ticker,
-  startTime,
-  endTime,
-  limit,
-  interval,
-}) => {
+export const TradingChart = ({ ticker, tickerKLineData, latestData }) => {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const candlestickSeriesRef = useRef(null);
-  const { tickerKLineData } = useTickerKLine(
-    ticker,
-    startTime,
-    endTime,
-    limit,
-    interval
-  );
-  const { data, error } = useWebSocketData(ticker);
-
-  console.log('data', data);
 
   const transformKLineData = useCallback((klineData) => {
     if (!klineData || !Array.isArray(klineData)) {
@@ -34,18 +16,8 @@ export const TradingChart = ({
 
     try {
       return klineData.map((candle) => {
-        const utcDate = new Date(Number(candle[0]));
-        const utcTimestamp =
-          Date.UTC(
-            utcDate.getUTCFullYear(),
-            utcDate.getUTCMonth(),
-            utcDate.getUTCDate(),
-            utcDate.getUTCHours(),
-            utcDate.getUTCMinutes()
-          ) / 1000;
-
         return {
-          time: utcTimestamp,
+          time: candle[0] / 1000,
           open: Number(candle[1]),
           high: Number(candle[2]),
           low: Number(candle[3]),
@@ -77,6 +49,10 @@ export const TradingChart = ({
       },
       timeScale: {
         timeVisible: true,
+        tickMarkFormatter: (time) => {
+          const date = new Date(time * 1000);
+          return date.toLocaleTimeString();
+        },
       },
     };
 
@@ -113,11 +89,17 @@ export const TradingChart = ({
     if (!candlestickSeriesRef.current || !tickerKLineData?.length) return;
 
     const formattedData = transformKLineData(tickerKLineData);
+    console.log('formattedData', formattedData);
     if (formattedData.length > 0) {
       candlestickSeriesRef.current.setData(formattedData);
       chartRef.current?.timeScale().fitContent();
     }
   }, [tickerKLineData, transformKLineData]);
+
+  useEffect(() => {
+    if (!candlestickSeriesRef.current || !latestData) return;
+    candlestickSeriesRef.current.update(latestData);
+  }, [latestData]);
 
   return (
     <div className='chart-container'>
@@ -135,10 +117,10 @@ export const TradingChart = ({
               <span>Vest</span>
             </div>
             <div className='chart-price-details'>
-              <span>O: {tickerKLineData[tickerKLineData.length - 1][1]}</span>
-              <span>H: {tickerKLineData[tickerKLineData.length - 1][2]}</span>
-              <span>L: {tickerKLineData[tickerKLineData.length - 1][3]}</span>
-              <span>C: {tickerKLineData[tickerKLineData.length - 1][4]}</span>
+              <span>O: {latestData?.open}</span>
+              <span>H: {latestData?.high}</span>
+              <span>L: {latestData?.low}</span>
+              <span>C: {latestData?.close}</span>
             </div>
           </div>
         )}
