@@ -74,7 +74,6 @@ export const TradingPanel = ({ latestData }) => {
     submitSound.play();
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      console.log('rect', rect);
       const x = (rect.x + rect.width / 2) / window.innerWidth;
       const y = (rect.y + rect.height / 2) / window.innerHeight;
       fireConfetti(x, y);

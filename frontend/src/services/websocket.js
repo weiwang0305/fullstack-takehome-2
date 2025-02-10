@@ -93,7 +93,6 @@ const subscribe = async (symbol, interval) => {
     id: 1,
   };
 
-  console.log('Sending subscribe message:', subscribeMessage);
   ws.send(JSON.stringify(subscribeMessage));
 };
 
@@ -175,7 +174,6 @@ export const wsService = {
 
     try {
       const url = WS_BASE_URL;
-      console.log('Connecting to URL:', url);
       connectionPromise = setupWebSocket(url, symbol, interval, onMessage);
       return await connectionPromise;
     } catch (error) {

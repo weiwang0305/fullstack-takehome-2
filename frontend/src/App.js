@@ -57,8 +57,6 @@ function App() {
   );
   const { latestData } = useWebSocketData(ticker, interval);
 
-  console.log('latestData', latestData);
-
   return (
     <div className='App'>
       <Header setTicker={setTicker} />

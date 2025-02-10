@@ -89,7 +89,6 @@ export const TradingChart = ({ ticker, tickerKLineData, latestData }) => {
     if (!candlestickSeriesRef.current || !tickerKLineData?.length) return;
 
     const formattedData = transformKLineData(tickerKLineData);
-    console.log('formattedData', formattedData);
     if (formattedData.length > 0) {
       candlestickSeriesRef.current.setData(formattedData);
       chartRef.current?.timeScale().fitContent();
